@@ -1,8 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import firebase from "firebase";
-
-import logo from './logo.svg';
-import './App.css';
 
 // Required for side-effects
 require("firebase/firestore");
@@ -20,33 +17,22 @@ function App() {
     measurementId: "G-HNZ6CM6TZP"
   };
 
-  // Initialize Cloud Firestore through Firebase
-firebase.initializeApp(firebaseConfig);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+ }
 
 var db = firebase.firestore();
 
-db.collection("test").get().then((querySnapshot) => {
-  querySnapshot.forEach((doc) => {
-      console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-  });
-});
+const [data, setData] = useState(null);
+
+useEffect(() => {
+  db.collection("test").get().then((result) => result.docs.map(doc => setData(doc.data())));
+}, [data, db]);
+ 
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+     {data && JSON.stringify(data)}
     </div>
   );
 }
